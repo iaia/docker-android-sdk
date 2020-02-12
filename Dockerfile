@@ -1,13 +1,21 @@
 FROM openjdk:8
 
-MAINTAINER Takao Chiba <chibatching.apps@gmail.com>
-
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get update && \
-    apt-get install -yq libc6 libstdc++6 zlib1g libncurses5 build-essential libssl-dev ruby ruby-dev --no-install-recommends && \
+    apt-get install -yq libc6 libstdc++6 zlib1g libncurses5 build-essential libssl-dev zlib1g-dev libreadline-dev --no-install-recommends && \
     apt-get clean
-    
+
+# Install rbenv and ruby
+RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv
+ENV PATH /root/.rbenv/bin:$PATH
+RUN eval "$(rbenv init -)"
+RUN mkdir -p "$(rbenv root)"/plugins && \
+    git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+RUN rbenv install 2.6.1
+RUN rbenv rehash
+ENV PATH /root/.rbenv/versions/2.6.1/bin:$PATH
+
 RUN gem install bundler
 
 # Download and untar Android SDK tools
